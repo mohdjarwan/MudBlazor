@@ -1,0 +1,108 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+<MudTextField @bind-Value="searchString"
+              Placeholder="Search..."
+              Adornment="Adornment.Start"
+              AdornmentIcon="@Icons.Material.Filled.Search"
+              Class="mb-4 pt-5"
+              Immediate="true"
+              DebounceInterval="300" />
+@* <MudCard Class="p-5"> *@
+
+    <MudText Class="pb-5" Typo="Typo.h6">Welcome to MudBlazor 😎</MudText>
+    <MudTable  AllowUnsorted="false" Items="FilteredEmployees" Elevation="2" Striped="true" Bordered="true" SortLabel="Sort">
+        <HeaderContent>
+            <MudTh Class="text-center"><MudTableSortLabel SortBy="@((Employee x) => x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh Class="text-center"><MudTableSortLabel SortBy="@((Employee x) => x.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh Class="text-center"><MudTableSortLabel SortBy="@((Employee x) => x.Position)">Position</MudTableSortLabel></MudTh>
+            <MudTh Class="text-center"><MudTableSortLabel SortBy="@((Employee x) => x.Salary)">Salary</MudTableSortLabel></MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd DataLabel="Id" Class="text-center">@context.Id</MudTd>
+            <MudTd DataLabel="Name" Class="text-center">@context.Name</MudTd>
+            <MudTd DataLabel="Position" Class="text-center">@context.Position</MudTd>
+            <MudTd DataLabel="Salary" Class="text-center">
+                @context.Salary.ToString("C")
+                @if(context.Salary > 1000)
+                {
+                    <MudText>Rich</MudText>
+                }
+            </MudTd>
+        </RowTemplate>
+       <PagerContent>
+            <MudTablePager HorizontalAlignment=HorizontalAlignment.Center RowsPerPageString="Number of Raws Per Page: " PageSizeOptions="new int[] { 5, 10, 20 }" />
+        </PagerContent>
+    </MudTable>
+@* </MudCard> *@
+
+@code {
+    private string searchString = "";
+
+    private List<Employee> employees = new()
+    {
+new Employee { Id = 1, Name = "Adam", Position = "Manager", Salary = 1200 },
+new Employee { Id = 2, Name = "Lina", Position = "Developer", Salary = 950 },
+new Employee { Id = 3, Name = "Sara", Position = "Designer", Salary = 870 },
+new Employee { Id = 4, Name = "Omar", Position = "Developer", Salary = 980 },
+new Employee { Id = 5, Name = "Mona", Position = "HR", Salary = 900 },
+new Employee { Id = 6, Name = "Khalid", Position = "Support", Salary = 850 },
+new Employee { Id = 7, Name = "Rana", Position = "Manager", Salary = 1250 },
+new Employee { Id = 8, Name = "Fadi", Position = "Developer", Salary = 970 },
+new Employee { Id = 9, Name = "Nada", Position = "Designer", Salary = 880 },
+new Employee { Id = 10, Name = "Tariq", Position = "Support", Salary = 840 },
+new Employee { Id = 11, Name = "Hala", Position = "HR", Salary = 910 },
+new Employee { Id = 12, Name = "Yousef", Position = "Developer", Salary = 960 },
+new Employee { Id = 13, Name = "Lama", Position = "Designer", Salary = 875 },
+new Employee { Id = 14, Name = "Samir", Position = "Manager", Salary = 1230 },
+new Employee { Id = 15, Name = "Dina", Position = "Support", Salary = 830 },
+new Employee { Id = 16, Name = "Nader", Position = "Developer", Salary = 940 },
+new Employee { Id = 17, Name = "Rania", Position = "HR", Salary = 920 },
+new Employee { Id = 18, Name = "Bilal", Position = "Designer", Salary = 865 },
+new Employee { Id = 19, Name = "Mariam", Position = "Manager", Salary = 1240 },
+new Employee { Id = 20, Name = "Feras", Position = "Developer", Salary = 950 },
+new Employee { Id = 21, Name = "Sara", Position = "Support", Salary = 845 },
+new Employee { Id = 22, Name = "Jad", Position = "HR", Salary = 915 },
+new Employee { Id = 23, Name = "Hanan", Position = "Designer", Salary = 870 },
+new Employee { Id = 24, Name = "Karim", Position = "Developer", Salary = 960 },
+new Employee { Id = 25, Name = "Reem", Position = "Manager", Salary = 1220 },
+new Employee { Id = 26, Name = "Zaid", Position = "Support", Salary = 835 },
+new Employee { Id = 27, Name = "Lina", Position = "HR", Salary = 905 },
+new Employee { Id = 28, Name = "Ola", Position = "Designer", Salary = 880 },
+new Employee { Id = 29, Name = "Ahmad", Position = "Developer", Salary = 970 },
+new Employee { Id = 30, Name = "Maha", Position = "Manager", Salary = 1210 },
+new Employee { Id = 31, Name = "Rami", Position = "Support", Salary = 850 },
+new Employee { Id = 32, Name = "Laila", Position = "HR", Salary = 900 },
+new Employee { Id = 33, Name = "Tamer", Position = "Designer", Salary = 865 },
+new Employee { Id = 34, Name = "Sahar", Position = "Developer", Salary = 940 },
+new Employee { Id = 35, Name = "Nour", Position = "Manager", Salary = 1260 },
+new Employee { Id = 36, Name = "Fawzi", Position = "Support", Salary = 845 },
+new Employee { Id = 37, Name = "Dalia", Position = "HR", Salary = 920 },
+new Employee { Id = 38, Name = "Omar", Position = "Designer", Salary = 875 },
+new Employee { Id = 39, Name = "Nabil", Position = "Developer", Salary = 960 },
+new Employee { Id = 40, Name = "Rita", Position = "Manager", Salary = 1235 },
+new Employee { Id = 41, Name = "Hadi", Position = "Support", Salary = 840 },
+new Employee { Id = 42, Name = "Mona", Position = "HR", Salary = 910 },
+new Employee { Id = 43, Name = "Faris", Position = "Designer", Salary = 870 },
+new Employee { Id = 44, Name = "Aya", Position = "Developer", Salary = 950 },
+new Employee { Id = 45, Name = "Samah", Position = "Manager", Salary = 1245 },
+new Employee { Id = 46, Name = "Khalil", Position = "Support", Salary = 835 },
+new Employee { Id = 47, Name = "Nadia", Position = "HR", Salary = 905 },
+new Employee { Id = 48, Name = "Razan", Position = "Designer", Salary = 880 },
+new Employee { Id = 49, Name = "Omar", Position = "Developer", Salary = 960 },
+new Employee { Id = 50, Name = "Lina", Position = "Manager", Salary = 1250 },
+    };
+    private IEnumerable<Employee> FilteredEmployees => employees.Where(e =>
+    string.IsNullOrWhiteSpace(searchString)
+    || (e.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false)
+    || (e.Position?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false)
+).ToList();
+    class Employee
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; } ="Undefined";
+        public string? Position { get; set; }
+        public decimal Salary { get; set; }
+    }
+}
