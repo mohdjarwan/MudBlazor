@@ -124,6 +124,7 @@
                 <MudTh Class="text-center">User</MudTh>
                 <MudTh Class="text-center">Task</MudTh>
                 <MudTh Class="text-center">Status</MudTh>
+                <MudTh Class="text-center">Delete</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd Class="text-center">@context.user.Name</MudTd>
@@ -148,13 +149,96 @@
                             break;
                     }
                 </MudTd>
+                <MudTd Class="text-center" >
+                    <MudChip T="string" OnClick="@(() => delete(context.user.Id))" Color="Color.Error" Variant="Variant.Filled" Class="w-100" Style="max-width:100px">
+                        Delete
+                    </MudChip>
+                </MudTd>
             </RowTemplate>
         </MudTable>
     </MudPaper>
+    <MudDivider Class="my-5" />
+    <MudPaper Class="pa-5 pb-5">
 
+        <MudPaper Class="pa-4 mb-5">
+            <MudText Typo="Typo.h6" Class="mb-3">Add New User</MudText>
+
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="User Name" @bind-Value="_newUser.Name" Required="true" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Phone Number" @bind-Value="_newUser.phoneNumber" Required="true" />
+                </MudItem>
+            </MudGrid>
+
+            <MudDivider Class="my-3" />
+            <MudText Typo="Typo.subtitle1" Class="mb-2">Tasks</MudText>
+
+            <MudGrid>
+                @foreach (var task in _newUser.Tasks)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField Label="Task Description" @bind-Value="task.Description" Class="mb-2" />
+                        <MudSelect T="StatusEnum" Label="Status" @bind-Value="task.Status" Dense="true">
+                            <MudSelectItem Value="StatusEnum.Completed">Completed</MudSelectItem>
+                            <MudSelectItem Value="StatusEnum.Inprogress">In Progress</MudSelectItem>
+                            <MudSelectItem Value="StatusEnum.Pending">Pending</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                }
+            </MudGrid>
+
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="AddTask" Class="mt-3">
+                <MudIcon Icon="@Icons.Material.Filled.AddTask" /> Add Task
+            </MudButton>
+
+            <div class="mt-4">
+                <MudButton Color="Color.Primary" OnClick="SaveUser" Variant="Variant.Filled" Class="me-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Save" /> Save
+                </MudButton>
+                <MudButton Color="Color.Primary" OnClick="Cancel" Variant="Variant.Filled" Class="me-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Cancel" /> cancel
+                </MudButton>
+
+            </div>
+        </MudPaper>
+
+
+    </MudPaper>
 </MudContainer>
 
 @code {
+    private User _newUser = new();
+
+    private void AddTask()
+    {
+        _newUser.Tasks.Add(new TaskItem { Description = "", Status = StatusEnum.Pending });
+    }
+
+    private void SaveUser()
+    {
+        if (!string.IsNullOrWhiteSpace(_newUser.Name))
+        {
+            // assign user reference to tasks
+            foreach (var task in _newUser.Tasks)
+                task.user = _newUser;
+
+            _users.Add(_newUser);
+            _newUser = new(); // clear form
+        }
+    }
+    private void Cancel()
+    {
+        _newUser.Tasks.Clear();
+    }
+    private void delete(Guid id)
+    {
+        _users.Remove(_users.Where(x => x.Id == id ).FirstOrDefault()!);
+    }
+
+
+
     private List<string> recentUsers = new()
     {
         "Mohammad",
@@ -172,7 +256,6 @@
 
     protected override void OnInitialized()
     {
-        // 🔥 هذا السطر هو المفتاح:
         foreach (var user in _users)
             foreach (var task in user.Tasks)
                 task.user = user;
@@ -203,6 +286,11 @@
         new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
         new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
 
+        }},        new User{Id= new Guid(), Name = "Mohammad",phoneNumber = "07888888888" ,Tasks = new()
+        {
+        new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
+        new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
+
         }},
         new User{Id= new Guid(), Name = "Khaled",phoneNumber   = "07777777777" ,Tasks = new()
         {
@@ -213,6 +301,7 @@
         new TaskItem { Description = "fix auth bug", Status = StatusEnum.Pending},
         new TaskItem { Description = "add buttons", Status = StatusEnum.Completed}
         }} };
+
 
     public class TaskItem
     {
@@ -252,5 +341,4 @@
                   (_selectedUser == UserEnum.All || t.user.Name == _selectedUser.ToString()) &&
                   (_selectedStatus == StatusEnum.All || t.Status == _selectedStatus));
 
-// End of code block update
 }
