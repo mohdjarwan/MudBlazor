@@ -7,7 +7,7 @@
 
     <MudGrid>
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="pa-4" Style="background-color:#1976d2; color:white;">
+            <MudCard Class="pa-4" Style="background-color:black; color:white;">
                 <MudIcon Icon="@Icons.Material.Filled.SupervisedUserCircle"></MudIcon>
                 <MudText Typo="Typo.h6">Users</MudText>
                 <MudText Typo="Typo.h4">@_users.Count()</MudText>
@@ -15,7 +15,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="pa-4" Style="background-color:#2e7d32; color:white;">
+            <MudCard Class="pa-4" Style="background-color:#1976d2; color:white;">
                 <MudIcon Icon="@Icons.Material.Filled.Task"></MudIcon>
                 <MudText Typo="Typo.h6">Tasks</MudText>
                 <MudText Typo="Typo.h4">@_users.SelectMany(x => x.Tasks).Count()</MudText>
@@ -23,7 +23,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="pa-4" Style="background-color:#f57c00; color:white;">
+            <MudCard Class="pa-4" Style="background-color:green; color:white;">
                 <MudIcon Icon="@Icons.Material.Filled.Done"></MudIcon>
                 <MudText Typo="Typo.h6">Completed</MudText>
                 <MudText Typo="Typo.h4">@_users.SelectMany(x => x.Tasks).Where(x => x.Status == StatusEnum.Completed).Count()</MudText>
@@ -38,7 +38,7 @@
             </MudCard>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
-            <MudCard Class="pa-4" Style="background-color:#d32f2f; color:white;">
+            <MudCard Class="pa-4" Style="background-color:orange; color:white;">
                 <MudIcon Icon="@Icons.Material.Filled.Work"></MudIcon>
                 <MudText Typo="Typo.h6">In Progress</MudText>
                 <MudText Typo="Typo.h4">@_users.SelectMany(x => x.Tasks).Where(x => x.Status == StatusEnum.Inprogress).Count()</MudText>
@@ -47,7 +47,7 @@
     </MudGrid>
 
     <MudDivider Class="my-5" />
-    <MudGrid>
+    <MudGrid Class="w-100 h-100">
         <MudItem xs="12" md="8">
             <MudPaper Class="pa-4 h-100">
                 <MudText Typo="Typo.h6" Class="mb-2">Tasks Completion Chart</MudText>
@@ -73,7 +73,7 @@
         </MudItem>
 
         <MudItem xs="13" md="4">
-            <MudPaper Class="pa-4 h-100">
+            <MudPaper Class="pa-4 h-100" Style="max-height:500px; overflow-y:auto;">
                 <MudText Typo="Typo.h6" Class="mb-2">Recent Users</MudText>
 
                 <MudList T="object" Dense="true">
@@ -82,16 +82,8 @@
                         <MudListItem Class="onhover" T="object">
                             <MudListItem Icon="@Icons.Material.Filled.Person">@user.Name</MudListItem>
                         </MudListItem>
-                        @* <style>
-                            .onhover:hover {
-                                background-color: aqua !important; 
-                                color: brown; 
-                                cursor: pointer; 
-                            }
-                        </style> *@
                     }
                 </MudList>
-
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -111,11 +103,12 @@
                 </MudSelect>
             </MudItem>
             <MudItem xs="6" sm="3">
-                <MudSelect T="UserEnum" Label="Filter by User" @bind-Value="_selectedUser" Class="mb-4" Dense="true">
-
-                    <MudSelectItem Value="UserEnum.Mohammad">Mohammad</MudSelectItem>
-                    <MudSelectItem Value="UserEnum.Khaled">Khaled</MudSelectItem>
-                    <MudSelectItem Value="UserEnum.All">All</MudSelectItem>
+                <MudSelect T="string" Label="Filter by User" @bind-Value="_selectedUser" Class="mb-4" Dense="true">
+                    <MudSelectItem Value="@("All")">All</MudSelectItem>
+                    @foreach (var user in _users)
+                    {
+                        <MudSelectItem Value="@user.Name">@user.Name</MudSelectItem>
+                    }
                 </MudSelect>
             </MudItem>
         </MudGrid>
@@ -124,7 +117,8 @@
                 <MudTh Class="text-center">User</MudTh>
                 <MudTh Class="text-center">Task</MudTh>
                 <MudTh Class="text-center">Status</MudTh>
-                <MudTh Class="text-center">Delete</MudTh>
+                <MudTh Class="text-center">Delete Task</MudTh>
+                <MudTh Class="text-center">Delete User With Tasks</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd Class="text-center">@context.user.Name</MudTd>
@@ -133,29 +127,34 @@
                     @switch (context.Status)
                     {
                         case StatusEnum.Completed:
-                            <MudChip T="string" Color="Color.Success" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Done" Class="w-100" Style="max-width:150px">
+                            <MudChip OnClick="@(() => toggle(context))" T="string" Color="Color.Success" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Done" Class="w-100" Style="max-width:150px">
                                 Completed
                             </MudChip>
                             break;
                         case StatusEnum.Inprogress:
-                            <MudChip T="string" Color="Color.Warning" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Warning" Class="w-100" Style="max-width:150px">
+                            <MudChip OnClick="@(() => toggle(context))" T="string" Color="Color.Warning" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Warning" Class="w-100" Style="max-width:150px">
                                 In Progress
                             </MudChip>
                             break;
                         case StatusEnum.Pending:
-                            <MudChip T="string" Color="Color.Error" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Pending" Class="w-100" Style="max-width:150px">
+                            <MudChip OnClick="@(() => toggle(context))" T="string" Color="Color.Error" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Pending" Class="w-100" Style="max-width:150px">
                                 Pending
                             </MudChip>
                             break;
                     }
                 </MudTd>
-                <MudTd Class="text-center" >
-                    <MudChip T="string" OnClick="@(() => delete(context.user.Id))" Color="Color.Error" Variant="Variant.Filled" Class="w-100" Style="max-width:100px">
-                        Delete
+                <MudTd Class="text-center">
+                    <MudChip T="string" OnClick="@(() => deleteTask(context.Id))" Color="Color.Error" Variant="Variant.Text" Class="w-100" Style="max-width:100px">
+                        Delete Task
+                    </MudChip>
+                </MudTd>
+                <MudTd Class="text-center">
+                    <MudChip T="string" OnClick="@(() => deleteUser(context.user.Id))" Color="Color.Error" Variant="Variant.Filled" Class="w-100" Style="max-width:100px">
+                        Delete User
                     </MudChip>
                 </MudTd>
             </RowTemplate>
-        </MudTable>
+        </MudTable>  
     </MudPaper>
     <MudDivider Class="my-5" />
     <MudPaper Class="pa-5 pb-5">
@@ -232,11 +231,36 @@
     {
         _newUser.Tasks.Clear();
     }
-    private void delete(Guid id)
+    private void deleteTask(Guid id)
     {
-        _users.Remove(_users.Where(x => x.Id == id ).FirstOrDefault()!);
+        var user = _users.FirstOrDefault(u => u.Tasks.Any(t => t.Id == id));
+        if (user != null)
+        {
+            var task = user.Tasks.FirstOrDefault(t => t.Id == id);
+            if (task != null)
+                user.Tasks.Remove(task);
+        }
+    }
+    private void deleteUser(Guid id)
+    {
+        _users.Remove(_users.Where(x => x.Id == id).FirstOrDefault()!);
     }
 
+    private void toggle(TaskItem task)
+    {
+        if (task.Status == StatusEnum.Completed)
+        {
+            task.Status = StatusEnum.Pending;
+        }
+        else if (task.Status == StatusEnum.Pending)
+        {
+            task.Status = StatusEnum.Inprogress;
+        }
+        else if (task.Status == StatusEnum.Inprogress)
+        {
+            task.Status = StatusEnum.Completed;
+        }
+    }
 
 
     private List<string> recentUsers = new()
@@ -260,51 +284,104 @@
             foreach (var task in user.Tasks)
                 task.user = user;
     }
-
     private List<User> _users = new()
+{
+    new User { Name = "Mohammad", phoneNumber = "0788888888", Tasks = new()
     {
-        new User{Id= new Guid(), Name = "Mohammad",phoneNumber = "07888888888" ,Tasks = new()
-        {
-        new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
-        new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
+        new TaskItem { Description = "Fix API endpoint", Status = StatusEnum.Completed },
+        new TaskItem { Description = "Review PR #24", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Khaled", phoneNumber = "0799999999", Tasks = new()
+    {
+        new TaskItem { Description = "Implement search filter", Status = StatusEnum.Pending },
+        new TaskItem { Description = "Add unit tests", Status = StatusEnum.Completed },
+    }},
+    new User { Name = "Yousef", phoneNumber = "0777777777", Tasks = new()
+    {
+        new TaskItem { Description = "Fix auth bug", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Omar", phoneNumber = "0789456123", Tasks = new()
+    {
+        new TaskItem { Description = "Improve UI responsiveness", Status = StatusEnum.Completed },
+        new TaskItem { Description = "Refactor CSS", Status = StatusEnum.Pending },
+    }},
+    new User { Name = "Ahmad", phoneNumber = "0791122334", Tasks = new()
+    {
+        new TaskItem { Description = "Create dashboard layout", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Rami", phoneNumber = "0785566778", Tasks = new()
+    {
+        new TaskItem { Description = "Optimize SQL queries", Status = StatusEnum.Completed },
+        new TaskItem { Description = "Fix migration issues", Status = StatusEnum.Pending },
+    }},
+    new User { Name = "Hana", phoneNumber = "0793344556", Tasks = new()
+    {
+        new TaskItem { Description = "Update product images", Status = StatusEnum.Completed },
+        new TaskItem { Description = "Fix modal popup", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Sara", phoneNumber = "0789988776", Tasks = new()
+    {
+        new TaskItem { Description = "Write API documentation", Status = StatusEnum.Pending },
+    }},
+    new User { Name = "Lina", phoneNumber = "0775566443", Tasks = new()
+    {
+        new TaskItem { Description = "Test payment gateway", Status = StatusEnum.Completed },
+    }},
+    new User { Name = "Alaa", phoneNumber = "0798882221", Tasks = new()
+    {
+        new TaskItem { Description = "Deploy new version", Status = StatusEnum.Inprogress },
+        new TaskItem { Description = "Verify production logs", Status = StatusEnum.Pending },
+    }},
+    new User { Name = "Fares", phoneNumber = "0786677889", Tasks = new()
+    {
+        new TaskItem { Description = "Fix UI dark mode", Status = StatusEnum.Completed },
+    }},
+    new User { Name = "Tala", phoneNumber = "0792233445", Tasks = new()
+    {
+        new TaskItem { Description = "Add user notifications", Status = StatusEnum.Pending },
+        new TaskItem { Description = "Test email templates", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Hussein", phoneNumber = "0778899001", Tasks = new()
+    {
+        new TaskItem { Description = "Clean up old code", Status = StatusEnum.Completed },
+    }},
+    new User { Name = "Maya", phoneNumber = "0795556667", Tasks = new()
+    {
+        new TaskItem { Description = "Design new logo", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Rashed", phoneNumber = "0782345678", Tasks = new()
+    {
+        new TaskItem { Description = "Setup CI/CD pipeline", Status = StatusEnum.Completed },
+        new TaskItem { Description = "Check security warnings", Status = StatusEnum.Pending },
+    }},
+    new User { Name = "Nour", phoneNumber = "0791010101", Tasks = new()
+    {
+        new TaskItem { Description = "Improve accessibility", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Ali", phoneNumber = "0789090909", Tasks = new()
+    {
+        new TaskItem { Description = "Test API performance", Status = StatusEnum.Completed },
+    }},
+    new User { Name = "Samir", phoneNumber = "0793030303", Tasks = new()
+    {
+        new TaskItem { Description = "Integrate third-party API", Status = StatusEnum.Pending },
+        new TaskItem { Description = "Fix JWT validation bug", Status = StatusEnum.Inprogress },
+    }},
+    new User { Name = "Jana", phoneNumber = "0784445556", Tasks = new()
+    {
+        new TaskItem { Description = "Add dark theme support", Status = StatusEnum.Completed },
+    }},
+    new User { Name = "Mahmoud", phoneNumber = "0796060606", Tasks = new()
+    {
+        new TaskItem { Description = "Fix push notification issue", Status = StatusEnum.Pending },
+    }},
+};
 
-        }},
-        new User{Id= new Guid(), Name = "Mohammad",phoneNumber = "07888888888" ,Tasks = new()
-        {
-        new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
-        new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
-
-        }},
-        new User{Id= new Guid(), Name = "Mohammad",phoneNumber = "07888888888" ,Tasks = new()
-        {
-        new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
-        new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
-
-        }},
-        new User{Id= new Guid(), Name = "Mohammad",phoneNumber = "07888888888" ,Tasks = new()
-        {
-        new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
-        new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
-
-        }},        new User{Id= new Guid(), Name = "Mohammad",phoneNumber = "07888888888" ,Tasks = new()
-        {
-        new TaskItem { Description = "Fix login bug", Status = StatusEnum.Completed},
-        new TaskItem { Description = "UI Review", Status = StatusEnum.Inprogress},
-
-        }},
-        new User{Id= new Guid(), Name = "Khaled",phoneNumber   = "07777777777" ,Tasks = new()
-        {
-        new TaskItem { Description = "Add reports", Status = StatusEnum.Pending}
-        }},
-        new User{Id= new Guid(), Name = "yousef",phoneNumber   = "07999999999" ,Tasks = new()
-        {
-        new TaskItem { Description = "fix auth bug", Status = StatusEnum.Pending},
-        new TaskItem { Description = "add buttons", Status = StatusEnum.Completed}
-        }} };
 
 
     public class TaskItem
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Description { get; set; }
         public StatusEnum Status { get; set; }
         public User user { get; set; }
@@ -326,19 +403,19 @@
     }
     public class User
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = new Guid();
         public string Name { get; set; }
         public string phoneNumber { get; set; }
         public List<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 
     }
     private StatusEnum _selectedStatus = StatusEnum.All;
-    private UserEnum _selectedUser = UserEnum.All;
+    private string _selectedUser = "All";
 
     private IEnumerable<TaskItem> FilteredTasks =>
         _users.SelectMany(x => x.Tasks)
               .Where(t =>
-                  (_selectedUser == UserEnum.All || t.user.Name == _selectedUser.ToString()) &&
+                  (_selectedUser == "All" || t.user.Name == _selectedUser) &&
                   (_selectedStatus == StatusEnum.All || t.Status == _selectedStatus));
 
 }
